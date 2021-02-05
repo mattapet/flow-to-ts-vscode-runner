@@ -18,15 +18,39 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:extension.flow-to-ts-vscode-runner"
+    "*"
   ],
   "contributes": {
     "commands": [
       {
-        "command": "extension.flow-to-ts-vscode-runner",
-        "title": "flow-to-ts"
+        "command": "extension.convertFlowFileToTs",
+        "title": "Covert File to Typescript"
+      },
+      {
+        "command": "extension.convertFlowDirectoryToTs",
+        "title": "Covert Directory to Typescript"
       }
-    ]
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "extension.convertFlowFileToTs",
+          "group": "01_flow-to-typescript"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "extension.convertFlowFileToTs",
+          "group": "01_flow-to-typescript",
+          "when": "!explorerResourceIsFolder"
+        },
+        {
+          "command": "extension.convertFlowDirectoryToTs",
+          "group": "01_flow-to-typescript",
+          "when": "explorerResourceIsFolder"
+        }
+      ]
+    }
   },
   "devDependencies": {
     "@types/jest": "^26.0.20",
