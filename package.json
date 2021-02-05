@@ -1,0 +1,44 @@
+{
+  "name": "flow-to-ts-vscode-runner",
+  "version": "1.0.0",
+  "main": "./dist/extension.js",
+  "author": "Peter Matta <developer@mattapet.com>",
+  "license": "MIT",
+  "scripts": {
+    "vscode:prepublish": "yarn compile",
+    "compile": "tsc -p ./",
+    "lint": "eslint . --ext .ts,.tsx",
+    "watch": "tsc -watch -p ./"
+  },
+  "displayName": "flow-to-ts-vscode-runner",
+  "engines": {
+    "vscode": "^1.52.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:extension.flow-to-ts-vscode-runner"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "extension.flow-to-ts-vscode-runner",
+        "title": "flow-to-ts"
+      }
+    ]
+  },
+  "devDependencies": {
+    "@types/jest": "^26.0.20",
+    "@types/vscode": "^1.53.0",
+    "@typescript-eslint/eslint-plugin": "^4.14.2",
+    "@typescript-eslint/parser": "^4.14.2",
+    "eslint": "^7.19.0",
+    "eslint-config-prettier": "^7.2.0",
+    "eslint-plugin-prettier": "^3.3.1",
+    "jest": "^26.6.3",
+    "prettier": "^2.2.1",
+    "ts-jest": "^26.5.0",
+    "typescript": "^4.1.3"
+  }
+}
