@@ -1,5 +1,10 @@
 import * as vscode from 'vscode';
 
+import {
+  createConvertDirectoryCommand,
+  createConvertFileCommand,
+} from './commands';
+
 export function activate(context: vscode.ExtensionContext): void {
   console.log(
     'Congratulations, your extension "flow-to-ts-vscode-runner" is now active!',
@@ -7,26 +12,17 @@ export function activate(context: vscode.ExtensionContext): void {
 
   let terminal: vscode.Terminal | undefined;
 
-  async function convertFile(filePath: string) {
+  async function executeTerminalCommand(createCommand: () => string) {
     const t = (terminal =
       terminal ?? vscode.window.createTerminal('flow-to-ts'));
 
     t.show();
     await vscode.commands.executeCommand('workbench.action.terminal.clear');
-    t.sendText(
-      `./node_modules/.bin/flow-to-ts --write --prettier ${filePath} -o ts`,
-    );
-  }
-
-  async function convertDirectory(dirPath: string) {
-    const t = (terminal =
-      terminal ?? vscode.window.createTerminal('flow-to-ts'));
-
-    t.show();
-    await vscode.commands.executeCommand('workbench.action.terminal.clear');
-    t.sendText(
-      `find ${dirPath} -type f -name '*.js' | xargs ./node_modules/.bin/flow-to-ts --write --prettier -o ts`,
-    );
+    try {
+      t.sendText(createCommand());
+    } catch (error) {
+      vscode.window.showErrorMessage(error.message);
+    }
   }
 
   const covertFileToTs = vscode.commands.registerCommand(
@@ -34,17 +30,13 @@ export function activate(context: vscode.ExtensionContext): void {
     (target?: any) => {
       if (target) {
         const { path } = target;
-        convertFile(path);
-        return vscode.window.showInformationMessage(`Convert file '${path}'`);
+        return executeTerminalCommand(() => createConvertFileCommand(path));
       }
 
       const editor = vscode.window.activeTextEditor;
       if (editor) {
         const filePath = editor.document.fileName;
-        convertFile(filePath);
-        return vscode.window.showInformationMessage(
-          `You're in file '${filePath}'`,
-        );
+        return executeTerminalCommand(() => createConvertFileCommand(filePath));
       }
 
       vscode.window.showInformationMessage('No file to convert');
@@ -55,8 +47,7 @@ export function activate(context: vscode.ExtensionContext): void {
     'extension.convertFlowDirectoryToTs',
     (target: any) => {
       const { path } = target;
-      convertDirectory(path);
-      vscode.window.showInformationMessage(`Convert directory '${path}'`);
+      executeTerminalCommand(() => createConvertDirectoryCommand(path));
     },
   );
 

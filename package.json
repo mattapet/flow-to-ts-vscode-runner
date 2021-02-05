@@ -5,6 +5,7 @@
   "author": "Peter Matta <developer@mattapet.com>",
   "license": "MIT",
   "scripts": {
+    "test": "NODE_ENV=test jest -c ./jest.config.js",
     "vscode:prepublish": "yarn compile",
     "compile": "tsc -p ./",
     "lint": "eslint . --ext .ts,.tsx",
