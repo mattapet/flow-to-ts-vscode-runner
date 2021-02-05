@@ -13,16 +13,20 @@ export function activate(context: vscode.ExtensionContext): void {
 
     t.show();
     await vscode.commands.executeCommand('workbench.action.terminal.clear');
-    t.sendText(`cat ${filePath}`);
+    t.sendText(
+      `./node_modules/.bin/flow-to-ts --write --prettier ${filePath} -o ts`,
+    );
   }
 
-  async function convertDirectory(filePath: string) {
+  async function convertDirectory(dirPath: string) {
     const t = (terminal =
       terminal ?? vscode.window.createTerminal('flow-to-ts'));
 
     t.show();
     await vscode.commands.executeCommand('workbench.action.terminal.clear');
-    t.sendText(`find ${filePath} -type f -name '*.js'`);
+    t.sendText(
+      `find ${dirPath} -type f -name '*.js' | xargs ./node_modules/.bin/flow-to-ts --write --prettier -o ts`,
+    );
   }
 
   const covertFileToTs = vscode.commands.registerCommand(
