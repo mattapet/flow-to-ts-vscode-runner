@@ -25,11 +25,15 @@
     "commands": [
       {
         "command": "extension.convertFlowFileToTs",
-        "title": "Covert File to Typescript"
+        "title": "Convert File to Typescript"
       },
       {
         "command": "extension.convertFlowDirectoryToTs",
-        "title": "Covert Directory to Typescript"
+        "title": "Convert Directory to Typescript"
+      },
+      {
+        "command": "extension.generateTypescriptDefinitionsForFile",
+        "title": "Generate Typescript Definitions For File"
       }
     ],
     "menus": {
@@ -37,11 +41,20 @@
         {
           "command": "extension.convertFlowFileToTs",
           "group": "01_flow-to-typescript"
+        },
+        {
+          "command": "extension.generateTypescriptDefinitionsForFile",
+          "group": "01_flow-to-typescript"
         }
       ],
       "explorer/context": [
         {
           "command": "extension.convertFlowFileToTs",
+          "group": "01_flow-to-typescript",
+          "when": "!explorerResourceIsFolder"
+        },
+        {
+          "command": "extension.generateTypescriptDefinitionsForFile",
           "group": "01_flow-to-typescript",
           "when": "!explorerResourceIsFolder"
         },

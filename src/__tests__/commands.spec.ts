@@ -1,6 +1,7 @@
 import {
   createConvertFileCommand,
   createConvertDirectoryCommand,
+  createGenerateTSDefForFile,
 } from '../commands';
 
 describe('commands', () => {
@@ -11,7 +12,7 @@ describe('commands', () => {
       const result = createConvertFileCommand(fileName);
 
       expect(result).toEqual(
-        'node ./node_modules/.bin/flow-to-ts --write --prettier sample-flow-file.js -o ts',
+        `node ./node_modules/.bin/flow-to-ts --write --prettier 'sample-flow-file.js' -o ts`,
       );
     });
 
@@ -34,6 +35,28 @@ describe('commands', () => {
 
       expect(result).toEqual(
         `find 'some-dir-filled-with-flow-files' -type f -name '*.js' | xargs node ./node_modules/.bin/flow-to-ts --write --prettier -o ts`,
+      );
+    });
+  });
+
+  describe('generating definitions', () => {
+    it('should create command using local tsc to generate .d.ts for the given file', () => {
+      const fileName = 'some-ts-file.ts';
+
+      const result = createGenerateTSDefForFile(fileName);
+
+      expect(result).toEqual(
+        `./node_modules/.bin/tsc 'some-ts-file.ts' --declaration --emitDeclarationOnly`,
+      );
+    });
+
+    it('should throw an error if the given files is not a typescript file', () => {
+      const fileName = 'some-flow-file.js';
+
+      const fn = () => createGenerateTSDefForFile(fileName);
+
+      expect(fn).toThrowError(
+        new Error(`Cannot convert non-typescript file 'some-flow-file.js'`),
       );
     });
   });
