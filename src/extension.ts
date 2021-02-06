@@ -4,6 +4,7 @@ import {
   convertDirectory,
   convertFile,
   generateTSDefForFile,
+  generateFlowDefForFile,
   Command,
 } from './commands';
 
@@ -24,6 +25,11 @@ export function activate(context: vscode.ExtensionContext): void {
     generateTSDefForFile,
   );
 
+  const generateFlowDefinitionsForFile = registerFileTargetingCommand(
+    'extension.generateFlowDefinitionsForFile',
+    generateFlowDefForFile,
+  );
+
   const covertDirectoryToTs = registerDirectoryTargetingCommand(
     'extension.convertFlowDirectoryToTs',
     convertDirectory,
@@ -32,6 +38,7 @@ export function activate(context: vscode.ExtensionContext): void {
   context.subscriptions.push(covertFileToTs);
   context.subscriptions.push(covertDirectoryToTs);
   context.subscriptions.push(generateTypescriptDefinitionsForFile);
+  context.subscriptions.push(generateFlowDefinitionsForFile);
 
   vscode.window.onDidCloseTerminal(() => {
     terminal = undefined;
@@ -48,7 +55,7 @@ export function activate(context: vscode.ExtensionContext): void {
       async (target?: vscode.Uri) => {
         const filePath = getTargetFilePath(target);
         if (!filePath) {
-          return vscode.window.showInformationMessage('No file to convert');
+          return vscode.window.showInformationMessage('No target to convert');
         }
 
         try {
@@ -64,13 +71,21 @@ export function activate(context: vscode.ExtensionContext): void {
     name: string,
     cmd: Command,
   ): vscode.Disposable {
-    return vscode.commands.registerCommand(name, async (target: vscode.Uri) => {
-      try {
-        cmd(await getCommandExecution())(target.path);
-      } catch (error) {
-        vscode.window.showErrorMessage(error.message);
-      }
-    });
+    return vscode.commands.registerCommand(
+      name,
+      async (target?: vscode.Uri) => {
+        const directoryPath = getTargetDirPath(target);
+        if (!directoryPath) {
+          return vscode.window.showInformationMessage('No target to convert');
+        }
+
+        try {
+          cmd(await getCommandExecution())(directoryPath);
+        } catch (error) {
+          vscode.window.showErrorMessage(error.message);
+        }
+      },
+    );
   }
 
   async function getCommandExecution(): Promise<(cmd: string) => void> {
@@ -88,5 +103,9 @@ export function activate(context: vscode.ExtensionContext): void {
 
   function getTargetFilePath(target?: vscode.Uri): string | undefined {
     return target?.path ?? vscode.window.activeTextEditor?.document.fileName;
+  }
+
+  function getTargetDirPath(target?: vscode.Uri): string | undefined {
+    return target?.path;
   }
 }

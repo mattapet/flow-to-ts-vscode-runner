@@ -28,6 +28,22 @@ export const generateTSDefForFile: Command = (executeCommand) => (filePath) => {
   );
 };
 
+export const generateFlowDefForFile: Command = (executeCommand) => (
+  filePath,
+) => {
+  if (!/.*\.ts$/.test(filePath)) {
+    throw new Error(
+      `Cannot generate Flow definitions from non-typescript file '${filePath}'`,
+    );
+  }
+  const sourceName = path.basename(filePath).replace(/\.ts$/, '');
+  const fileDirectory = path.dirname(filePath);
+
+  executeCommand(
+    `node ./node_modules/.bin/flowgen '${filePath}' --add-flow-header -o '${fileDirectory}/${sourceName}.js.flow'`,
+  );
+};
+
 export const convertDirectory: Command = (executeCommand) => (
   directoryPath,
 ) => {

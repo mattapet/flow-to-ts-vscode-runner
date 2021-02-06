@@ -2,6 +2,7 @@ import {
   convertDirectory,
   convertFile,
   generateTSDefForFile,
+  generateFlowDefForFile,
 } from '../commands';
 
 describe('commands', () => {
@@ -59,13 +60,37 @@ describe('commands', () => {
       );
     });
 
-    it('should throw an error if the given files is not a flow file', () => {
+    it('should throw an error if the given file is not a flow file', () => {
       const fileName = 'some-flow-file.ts';
 
       const fn = () => generateTSDefForFile(executeCommand)(fileName);
 
       expect(fn).toThrowError(
         new Error(`Cannot convert non-flow file 'some-flow-file.ts'`),
+      );
+    });
+  });
+
+  describe('generating typescript definitions', () => {
+    it('should create command using local flowgen to generate .js.flow for the given file', () => {
+      const fileName = 'path/to/file/some-typescript-file.ts';
+
+      generateFlowDefForFile(executeCommand)(fileName);
+
+      expect(executeCommand).toHaveBeenCalledWith(
+        `node ./node_modules/.bin/flowgen 'path/to/file/some-typescript-file.ts' --add-flow-header -o 'path/to/file/some-typescript-file.js.flow'`,
+      );
+    });
+
+    it('should throw an error if the given file is not a typescript file', () => {
+      const fileName = 'path/to/some-flow-file.js';
+
+      const fn = () => generateFlowDefForFile(executeCommand)(fileName);
+
+      expect(fn).toThrowError(
+        new Error(
+          `Cannot generate Flow definitions from non-typescript file 'path/to/some-flow-file.js'`,
+        ),
       );
     });
   });
