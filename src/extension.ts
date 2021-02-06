@@ -1,9 +1,10 @@
 import * as vscode from 'vscode';
 
 import {
-  createConvertDirectoryCommand,
-  createConvertFileCommand,
-  createGenerateTSDefForFile,
+  convertDirectory,
+  convertFile,
+  generateTSDefForFile,
+  Command,
 } from './commands';
 
 export function activate(context: vscode.ExtensionContext): void {
@@ -13,66 +14,19 @@ export function activate(context: vscode.ExtensionContext): void {
 
   let terminal: vscode.Terminal | undefined;
 
-  async function executeTerminalCommand(createCommand: () => string) {
-    const t = (terminal =
-      terminal ?? vscode.window.createTerminal('flow-to-ts'));
-
-    const { uri } = vscode.workspace.workspaceFolders![0];
-
-    t.show();
-    await vscode.commands.executeCommand('workbench.action.terminal.clear');
-    t.sendText(`cd ${uri.path}`);
-    try {
-      t.sendText(createCommand());
-    } catch (error) {
-      vscode.window.showErrorMessage(error.message);
-    }
-  }
-
-  const covertFileToTs = vscode.commands.registerCommand(
+  const covertFileToTs = registerFileTargetingCommand(
     'extension.convertFlowFileToTs',
-    (target?: vscode.Uri) => {
-      if (target) {
-        const { path } = target;
-        return executeTerminalCommand(() => createConvertFileCommand(path));
-      }
-
-      const editor = vscode.window.activeTextEditor;
-      if (editor) {
-        const filePath = editor.document.fileName;
-        return executeTerminalCommand(() => createConvertFileCommand(filePath));
-      }
-
-      vscode.window.showInformationMessage('No file to convert');
-    },
+    convertFile,
   );
 
-  const generateTypescriptDefinitionsForFile = vscode.commands.registerCommand(
+  const generateTypescriptDefinitionsForFile = registerFileTargetingCommand(
     'extension.generateTypescriptDefinitionsForFile',
-    (target?: vscode.Uri) => {
-      if (target) {
-        const { path } = target;
-        return executeTerminalCommand(() => createGenerateTSDefForFile(path));
-      }
-
-      const editor = vscode.window.activeTextEditor;
-      if (editor) {
-        const filePath = editor.document.fileName;
-        return executeTerminalCommand(() =>
-          createGenerateTSDefForFile(filePath),
-        );
-      }
-
-      vscode.window.showInformationMessage('No file to convert');
-    },
+    generateTSDefForFile,
   );
 
-  const covertDirectoryToTs = vscode.commands.registerCommand(
+  const covertDirectoryToTs = registerDirectoryTargetingCommand(
     'extension.convertFlowDirectoryToTs',
-    (target: vscode.Uri) => {
-      const { path } = target;
-      executeTerminalCommand(() => createConvertDirectoryCommand(path));
-    },
+    convertDirectory,
   );
 
   context.subscriptions.push(covertFileToTs);
@@ -82,4 +36,57 @@ export function activate(context: vscode.ExtensionContext): void {
   vscode.window.onDidCloseTerminal(() => {
     terminal = undefined;
   });
+
+  // - utilities
+
+  function registerFileTargetingCommand(
+    name: string,
+    cmd: Command,
+  ): vscode.Disposable {
+    return vscode.commands.registerCommand(
+      name,
+      async (target?: vscode.Uri) => {
+        const filePath = getTargetFilePath(target);
+        if (!filePath) {
+          return vscode.window.showInformationMessage('No file to convert');
+        }
+
+        try {
+          cmd(await getCommandExecution())(filePath);
+        } catch (error) {
+          vscode.window.showErrorMessage(error.message);
+        }
+      },
+    );
+  }
+
+  function registerDirectoryTargetingCommand(
+    name: string,
+    cmd: Command,
+  ): vscode.Disposable {
+    return vscode.commands.registerCommand(name, async (target: vscode.Uri) => {
+      try {
+        cmd(await getCommandExecution())(target.path);
+      } catch (error) {
+        vscode.window.showErrorMessage(error.message);
+      }
+    });
+  }
+
+  async function getCommandExecution(): Promise<(cmd: string) => void> {
+    const t = (terminal =
+      terminal ?? vscode.window.createTerminal('flow-to-ts'));
+
+    const { uri } = vscode.workspace.workspaceFolders![0];
+
+    t.show();
+    await vscode.commands.executeCommand('workbench.action.terminal.clear');
+    t.sendText(`cd ${uri.path}`);
+
+    return (cmd) => t.sendText(cmd);
+  }
+
+  function getTargetFilePath(target?: vscode.Uri): string | undefined {
+    return target?.path ?? vscode.window.activeTextEditor?.document.fileName;
+  }
 }
