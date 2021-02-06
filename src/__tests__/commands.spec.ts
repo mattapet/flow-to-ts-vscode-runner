@@ -45,24 +45,27 @@ describe('commands', () => {
     });
   });
 
-  describe('generating definitions', () => {
-    it('should create command using local tsc to generate .d.ts for the given file', () => {
-      const fileName = 'some-ts-file.ts';
+  describe('generating flow definitions', () => {
+    it('should create command using local flow-to-ts and tsc to generate .d.ts for the given file', () => {
+      const fileName = 'path/to/file/some-flow-file.js';
 
       generateTSDefForFile(executeCommand)(fileName);
 
       expect(executeCommand).toHaveBeenCalledWith(
-        `./node_modules/.bin/tsc 'some-ts-file.ts' --declaration --emitDeclarationOnly`,
+        `node ./node_modules/.bin/flow-to-ts --prettier 'path/to/file/some-flow-file.js' -o ts > 'path/to/file/.some-flow-file.ts' && ` +
+          `node ./node_modules/.bin/tsc 'path/to/file/.some-flow-file.ts' --declaration --emitDeclarationOnly && ` +
+          `rm -f 'path/to/file/.some-flow-file.ts' && ` +
+          `mv 'path/to/file/.some-flow-file.d.ts' 'path/to/file/some-flow-file.d.ts'`,
       );
     });
 
-    it('should throw an error if the given files is not a typescript file', () => {
-      const fileName = 'some-flow-file.js';
+    it('should throw an error if the given files is not a flow file', () => {
+      const fileName = 'some-flow-file.ts';
 
       const fn = () => generateTSDefForFile(executeCommand)(fileName);
 
       expect(fn).toThrowError(
-        new Error(`Cannot convert non-typescript file 'some-flow-file.js'`),
+        new Error(`Cannot convert non-flow file 'some-flow-file.ts'`),
       );
     });
   });

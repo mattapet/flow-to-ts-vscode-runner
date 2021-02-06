@@ -1,3 +1,5 @@
+import * as path from 'path';
+
 export type CommandExecutor = (command: string) => void;
 export type Command = (ex: CommandExecutor) => (path: string) => void;
 
@@ -12,11 +14,17 @@ export const convertFile: Command = (executeCommand) => (filePath) => {
 };
 
 export const generateTSDefForFile: Command = (executeCommand) => (filePath) => {
-  if (!/.*\.ts$/.test(filePath)) {
-    throw new Error(`Cannot convert non-typescript file '${filePath}'`);
+  if (!/.*\.js$/.test(filePath)) {
+    throw new Error(`Cannot convert non-flow file '${filePath}'`);
   }
+  const sourceName = path.basename(filePath).replace(/\.js$/, '');
+  const fileDirectory = path.dirname(filePath);
+
   executeCommand(
-    `./node_modules/.bin/tsc '${filePath}' --declaration --emitDeclarationOnly`,
+    `node ./node_modules/.bin/flow-to-ts --prettier '${filePath}' -o ts > '${fileDirectory}/.${sourceName}.ts' && ` +
+      `node ./node_modules/.bin/tsc '${fileDirectory}/.${sourceName}.ts' --declaration --emitDeclarationOnly && ` +
+      `rm -f '${fileDirectory}/.${sourceName}.ts' && ` +
+      `mv '${fileDirectory}/.${sourceName}.d.ts' '${fileDirectory}/${sourceName}.d.ts'`,
   );
 };
 
