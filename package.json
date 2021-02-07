@@ -11,6 +11,10 @@
     "lint": "eslint . --ext .ts,.tsx",
     "watch": "tsc -watch -p ./"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mattapet/flow-to-ts-vscode-runner.git"
+  },
   "displayName": "flow-to-ts-vscode-runner",
   "engines": {
     "vscode": "^1.52.0"
