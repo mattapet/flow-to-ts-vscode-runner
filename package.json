@@ -1,6 +1,6 @@
 {
   "name": "flow-to-ts-vscode-runner",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "main": "./dist/extension.js",
   "author": "Peter Matta <developer@mattapet.com>",
   "license": "MIT",
