@@ -1,0 +1,13 @@
+.vscode/**
+node_modules/**
+src/**
+tests/**
+.eslintignore
+.eslintrc.js
+.gitignore
+.prettierrc
+.vscodeignore
+*.vsix
+jest.config.js
+tscondig.json
+yarn.lock

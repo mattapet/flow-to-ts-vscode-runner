@@ -2,14 +2,15 @@
   "name": "flow-to-ts-vscode-runner",
   "version": "0.0.1",
   "main": "./dist/extension.js",
+  "publisher": "mattapet",
   "author": "Peter Matta <developer@mattapet.com>",
   "license": "MIT",
   "scripts": {
     "test": "NODE_ENV=test jest -c ./jest.config.js",
-    "vscode:prepublish": "yarn compile",
-    "compile": "tsc -p ./",
+    "vscode:prepublish": "rm -rf dist && yarn compile",
+    "compile": "tsc -p tsconfig.production.json",
     "lint": "eslint . --ext .ts,.tsx",
-    "watch": "tsc -watch -p ./"
+    "watch": "tsc -watch -p tsconfig.build.ts"
   },
   "repository": {
     "type": "git",
@@ -88,7 +89,7 @@
   },
   "devDependencies": {
     "@types/jest": "^26.0.20",
-    "@types/vscode": "^1.53.0",
+    "@types/vscode": "^1.52.0",
     "@typescript-eslint/eslint-plugin": "^4.14.2",
     "@typescript-eslint/parser": "^4.14.2",
     "eslint": "^7.19.0",
