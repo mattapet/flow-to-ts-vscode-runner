@@ -13,7 +13,7 @@ export class Commands {
     this.F = new Algebra(config);
   }
 
-  convertFile: Command = (filePath) => {
+  convertFile: Command = filePath => {
     const target = new FileTarget(filePath);
     if (target.isNotFlowFile) {
       throw new Error(`Cannot convert non-flow file '${filePath}'`);
@@ -22,7 +22,7 @@ export class Commands {
     return this.F.flowToTs.convertFile(target);
   };
 
-  generateTSDefForFile: Command = (filePath) => {
+  generateTSDefForFile: Command = filePath => {
     const target = new FileTarget(filePath);
     if (target.isNotFlowFile) {
       throw new Error(`Cannot convert non-flow file '${filePath}'`);
@@ -35,7 +35,7 @@ export class Commands {
       .andThen(this.F.shell.rename(target.hidden().dts(), target.dts()));
   };
 
-  generateFlowDefForFile: Command = (filePath) => {
+  generateFlowDefForFile: Command = filePath => {
     const target = new FileTarget(filePath);
     if (target.isNotTSFile) {
       throw new Error(
@@ -46,7 +46,7 @@ export class Commands {
     return this.F.flowgen.emitDeclarations(target, target.jsFlow());
   };
 
-  convertDirectory: Command = (directoryPath) => {
+  convertDirectory: Command = directoryPath => {
     return this.F.shell
       .findAll(directoryPath, '*.js')
       .pipeAsArgsTo(this.F.flowToTs.convert());

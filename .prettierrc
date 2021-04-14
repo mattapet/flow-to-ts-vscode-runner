@@ -9,5 +9,6 @@
     true,
     "check-parameters"
   ],
-  "no-var-keyword": true
+  "no-var-keyword": true,
+  "arrowParens": "avoid"
 }
