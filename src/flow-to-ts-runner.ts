@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { Command } from './commands';
 
-export class FlowToTSExtension {
+export class FlowToTSRunner {
   private terminal?: vscode.Terminal;
 
   public constructor(private readonly context: vscode.ExtensionContext) {

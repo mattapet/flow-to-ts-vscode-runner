@@ -1,9 +1,9 @@
-import { CommandWriter } from './bin-utils';
+import { CommandWriter } from './command-writer';
 import { Algebra } from './algebra';
-import { Config } from './config';
 import { FileTarget } from './target';
 
-export type CommandExecutor = (command: string) => void;
+import { Config } from '../config';
+
 export type Command = (path: string) => CommandWriter;
 
 export class Commands {

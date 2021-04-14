@@ -1,6 +1,6 @@
-import { CommandWriter } from './bin-utils';
+import { CommandWriter } from './command-writer';
 import { FileTarget } from './target';
-import { Config } from './config';
+import { Config } from '../config';
 
 export class Algebra {
   public readonly shell: Shell;

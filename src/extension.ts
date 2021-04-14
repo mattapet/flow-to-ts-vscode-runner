@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 import { Commands } from './commands';
 import { Config } from './config';
 
-import { FlowToTSExtension } from './flow-to-ts-extension';
+import { FlowToTSRunner } from './flow-to-ts-runner';
 
 export function activate(context: vscode.ExtensionContext): void {
   console.log(
@@ -19,7 +19,7 @@ export function activate(context: vscode.ExtensionContext): void {
     generateFlowDefForFile,
   } = new Commands(config);
 
-  new FlowToTSExtension(context)
+  new FlowToTSRunner(context)
     .registerFileTargetingCommand('extension.convertFlowFileToTs', convertFile)
     .registerFileTargetingCommand(
       'extension.generateTypescriptDefinitionsForFile',

@@ -1,4 +1,4 @@
-import { Commands } from '../commands';
+import { Commands } from '..';
 
 describe('commands', () => {
   const {
