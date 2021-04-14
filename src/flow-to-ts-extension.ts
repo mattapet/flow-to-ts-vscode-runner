@@ -39,7 +39,8 @@ export class FlowToTSExtension {
         }
 
         try {
-          cmd(await this.getCommandExecution())(targetPath);
+          const execute = await this.getCommandExecution();
+          execute(cmd(targetPath));
         } catch (error) {
           vscode.window.showErrorMessage(error.message);
         }
