@@ -1,11 +1,7 @@
 import * as vscode from 'vscode';
 
-import {
-  convertDirectory,
-  convertFile,
-  generateTSDefForFile,
-  generateFlowDefForFile,
-} from './commands';
+import { Commands } from './commands';
+import { Config } from './config';
 
 import { FlowToTSExtension } from './flow-to-ts-extension';
 
@@ -14,7 +10,16 @@ export function activate(context: vscode.ExtensionContext): void {
     'Congratulations, your extension "flow-to-ts-vscode-runner" is now active!',
   );
 
-  new FlowToTSExtension(vscode.window, context)
+  const config = new VSCodeConfig();
+
+  const {
+    convertDirectory,
+    convertFile,
+    generateTSDefForFile,
+    generateFlowDefForFile,
+  } = new Commands(config);
+
+  new FlowToTSExtension(context)
     .registerFileTargetingCommand('extension.convertFlowFileToTs', convertFile)
     .registerFileTargetingCommand(
       'extension.generateTypescriptDefinitionsForFile',
@@ -28,4 +33,30 @@ export function activate(context: vscode.ExtensionContext): void {
       'extension.convertFlowDirectoryToTs',
       convertDirectory,
     );
+}
+
+class VSCodeConfig implements Config {
+  public get flowToTsPath(): string {
+    const value: string | undefined = vscode.workspace
+      .getConfiguration()
+      .get('flow-to-ts-runner.flow-to-tsPath');
+
+    return value || './node_modules/.bin/flow-to-ts';
+  }
+
+  public get tscPath(): string {
+    const value: string | undefined = vscode.workspace
+      .getConfiguration()
+      .get('flow-to-ts-runner.tscPath');
+
+    return value || './node_modules/.bin/tsc';
+  }
+
+  public get flowgenPath(): string {
+    const value: string | undefined = vscode.workspace
+      .getConfiguration()
+      .get('flow-to-ts-runner.flowgenPath');
+
+    return value || './node_modules/.bin/flowgen';
+  }
 }

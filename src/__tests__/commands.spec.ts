@@ -1,19 +1,25 @@
-import {
-  convertDirectory,
-  convertFile,
-  generateTSDefForFile,
-  generateFlowDefForFile,
-} from '../commands';
+import { Commands } from '../commands';
 
 describe('commands', () => {
+  const {
+    convertDirectory,
+    convertFile,
+    generateTSDefForFile,
+    generateFlowDefForFile,
+  } = new Commands({
+    flowToTsPath: './node_modules/.bin/flow-to-ts',
+    flowgenPath: './node_modules/.bin/flowgen',
+    tscPath: './node_modules/.bin/tsc',
+  });
+
   describe('convert file', () => {
     it('should use local flow-to-ts to convert single js file', () => {
       const fileName = 'sample-flow-file.js';
 
-      const result = convertFile(fileName);
+      const result = convertFile(fileName).run();
 
       expect(result).toBe(
-        `node ./node_modules/.bin/flow-to-ts --write --prettier './sample-flow-file.js' -o ts`,
+        `node './node_modules/.bin/flow-to-ts' --write --prettier './sample-flow-file.js' -o ts`,
       );
     });
 
@@ -32,10 +38,10 @@ describe('commands', () => {
     it('should use local flow-to-ts to convert .js files in the given directory', () => {
       const directoryName = 'some-dir-filled-with-flow-files';
 
-      const result = convertDirectory(directoryName);
+      const result = convertDirectory(directoryName).run();
 
       expect(result).toBe(
-        `find 'some-dir-filled-with-flow-files' -type f -name '*.js' | xargs node ./node_modules/.bin/flow-to-ts --write --prettier -o ts`,
+        `find 'some-dir-filled-with-flow-files' -type f -name '*.js' | xargs node './node_modules/.bin/flow-to-ts' --write --prettier -o ts`,
       );
     });
   });
@@ -44,11 +50,11 @@ describe('commands', () => {
     it('should create command using local flow-to-ts and tsc to generate .d.ts for the given file', () => {
       const fileName = 'path/to/file/some-flow-file.js';
 
-      const result = generateTSDefForFile(fileName);
+      const result = generateTSDefForFile(fileName).run();
 
       expect(result).toBe(
-        `node ./node_modules/.bin/flow-to-ts --prettier 'path/to/file/some-flow-file.js' -o ts > 'path/to/file/.some-flow-file.ts' && ` +
-          `node ./node_modules/.bin/tsc 'path/to/file/.some-flow-file.ts' --declaration --emitDeclarationOnly && ` +
+        `node './node_modules/.bin/flow-to-ts' --prettier 'path/to/file/some-flow-file.js' -o ts > 'path/to/file/.some-flow-file.ts' && ` +
+          `node './node_modules/.bin/tsc' 'path/to/file/.some-flow-file.ts' --declaration --emitDeclarationOnly && ` +
           `rm -f 'path/to/file/.some-flow-file.ts' && ` +
           `mv 'path/to/file/.some-flow-file.d.ts' 'path/to/file/some-flow-file.d.ts'`,
       );
@@ -69,10 +75,10 @@ describe('commands', () => {
     it('should create command using local flowgen to generate .js.flow for the given file', () => {
       const fileName = 'path/to/file/some-typescript-file.ts';
 
-      const result = generateFlowDefForFile(fileName);
+      const result = generateFlowDefForFile(fileName).run();
 
       expect(result).toBe(
-        `node ./node_modules/.bin/flowgen 'path/to/file/some-typescript-file.ts' --add-flow-header -o 'path/to/file/some-typescript-file.js.flow'`,
+        `node './node_modules/.bin/flowgen' 'path/to/file/some-typescript-file.ts' --add-flow-header -o 'path/to/file/some-typescript-file.js.flow'`,
       );
     });
 

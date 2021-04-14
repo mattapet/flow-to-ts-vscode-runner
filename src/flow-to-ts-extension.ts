@@ -4,11 +4,8 @@ import { Command } from './commands';
 export class FlowToTSExtension {
   private terminal?: vscode.Terminal;
 
-  public constructor(
-    private readonly window: typeof vscode.window,
-    private readonly context: vscode.ExtensionContext,
-  ) {
-    this.window.onDidCloseTerminal(() => {
+  public constructor(private readonly context: vscode.ExtensionContext) {
+    vscode.window.onDidCloseTerminal(() => {
       this.terminal = undefined;
     });
   }
@@ -39,8 +36,7 @@ export class FlowToTSExtension {
         }
 
         try {
-          const execute = await this.getCommandExecution();
-          execute(cmd(targetPath));
+          await this.executeCommand(cmd(targetPath).run());
         } catch (error) {
           vscode.window.showErrorMessage(error.message);
         }
@@ -48,7 +44,7 @@ export class FlowToTSExtension {
     );
   }
 
-  private async getCommandExecution(): Promise<(cmd: string) => void> {
+  private async executeCommand(cmd: string): Promise<void> {
     const t = (this.terminal =
       this.terminal ?? vscode.window.createTerminal('flow-to-ts'));
 
@@ -56,13 +52,12 @@ export class FlowToTSExtension {
 
     t.show();
     await vscode.commands.executeCommand('workbench.action.terminal.clear');
-    t.sendText(`cd ${uri.path}`);
-
-    return (cmd) => t.sendText(cmd);
+    t.sendText(`cd '${uri.path}'`);
+    t.sendText(cmd);
   }
 
   private getTargetFilePath(target?: vscode.Uri): string | undefined {
-    return target?.path ?? this.window.activeTextEditor?.document.fileName;
+    return target?.path ?? vscode.window.activeTextEditor?.document.fileName;
   }
 
   private getTargetDirPath(target?: vscode.Uri): string | undefined {

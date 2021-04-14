@@ -27,6 +27,31 @@
     "*"
   ],
   "contributes": {
+    "configuration": [
+      {
+        "title": "Flow-to-Typescript Config",
+        "properties": {
+          "flow-to-ts-runner.tscPath": {
+            "type": "string",
+            "default": "",
+            "description": "Path to the tsc binary (e.g., ./node_modules/.bind/tsc, /usr/local/bin/tsc)",
+            "scope": "window"
+          },
+          "flow-to-ts-runner.flow-to-tsPath": {
+            "type": "string",
+            "default": "",
+            "description": "Path to the tsc binary (e.g., ./node_modules/.bind/flow-to-ts, /usr/local/bin/flow-to-ts)",
+            "scope": "window"
+          },
+          "flow-to-ts-runner.flowgenPath": {
+            "type": "string",
+            "default": "",
+            "description": "Path to the tsc binary (e.g., ./node_modules/.bind/flowgen, /usr/local/bin/flowgen)",
+            "scope": "window"
+          }
+        }
+      }
+    ],
     "commands": [
       {
         "command": "extension.convertFlowFileToTs",

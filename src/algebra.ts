@@ -1,26 +1,45 @@
 import { CommandWriter } from './bin-utils';
 import { FileTarget } from './target';
+import { Config } from './config';
 
-class Shell {
-  public removeFile = (target: FileTarget): CommandWriter =>
-    new CommandWriter(() => `rm -f ${target}`);
+export class Algebra {
+  public readonly shell: Shell;
+  public readonly flowToTs: FlowToTs;
+  public readonly tsc: Tsc;
+  public readonly flowgen: Flowgen;
 
-  public rename = (from: FileTarget, to: FileTarget): CommandWriter =>
-    new CommandWriter(() => `mv ${from} ${to}`);
-
-  public findAll = (dir: string, pattern: string): CommandWriter =>
-    new CommandWriter(() => `find ${dir} -type f -name '${pattern}'`);
+  public constructor(config: Config) {
+    this.shell = new Shell();
+    this.flowToTs = new FlowToTs(config);
+    this.tsc = new Tsc(config);
+    this.flowgen = new Flowgen(config);
+  }
 }
 
-class FlowToTs {
-  public constructor(private readonly bin: string) {}
+export class Shell {
+  public removeFile = (target: FileTarget): CommandWriter =>
+    new CommandWriter(() => `rm -f '${target}'`);
+
+  public rename = (from: FileTarget, to: FileTarget): CommandWriter =>
+    new CommandWriter(() => `mv '${from}' '${to}'`);
+
+  public findAll = (dir: string, pattern: string): CommandWriter =>
+    new CommandWriter(() => `find '${dir}' -type f -name '${pattern}'`);
+}
+
+export class FlowToTs {
+  public constructor(private readonly config: Config) {}
+
+  private get bin(): string {
+    return this.config.flowToTsPath;
+  }
 
   public convert = (): CommandWriter =>
-    new CommandWriter(() => `node ${this.bin} --write --prettier -o ts`);
+    new CommandWriter(() => `node '${this.bin}' --write --prettier -o ts`);
 
   public convertFile = (target: FileTarget): CommandWriter =>
     new CommandWriter(
-      () => `node ${this.bin} --write --prettier '${target}' -o ts`,
+      () => `node '${this.bin}' --write --prettier '${target}' -o ts`,
     );
 
   public convertFileTo = (
@@ -28,24 +47,36 @@ class FlowToTs {
     output: FileTarget,
   ): CommandWriter =>
     new CommandWriter(
-      () => `node ${this.bin} --prettier -o '${target}' ts > ${output}`,
+      () => `node '${this.bin}' --prettier '${target}' -o ts > '${output}'`,
     );
 }
 
-class Tsc {
-  public constructor(private readonly bin: string) {}
+export class Tsc {
+  public constructor(private readonly config: Config) {}
 
-  public emitTSDeclarations = (target: FileTarget): CommandWriter =>
+  private get bin(): string {
+    return this.config.tscPath;
+  }
+
+  public emitDeclarations = (target: FileTarget): CommandWriter =>
     new CommandWriter(
-      () => `node ${this.bin} ${target} --declaration --emitDeclarationOnly`,
+      () =>
+        `node '${this.bin}' '${target}' --declaration --emitDeclarationOnly`,
     );
 }
 
-class Flowgen {
-  public constructor(private readonly bin: string) {}
+export class Flowgen {
+  public constructor(private readonly config: Config) {}
 
-  public emitFlowDeclarations = (target: FileTarget): CommandWriter =>
+  private get bin(): string {
+    return this.config.flowgenPath;
+  }
+
+  public emitDeclarations = (
+    target: FileTarget,
+    to: FileTarget,
+  ): CommandWriter =>
     new CommandWriter(
-      () => `node ${this.bin} '${target}' --add-flow-header -o '${target}'`,
+      () => `node '${this.bin}' '${target}' --add-flow-header -o '${to}'`,
     );
 }
