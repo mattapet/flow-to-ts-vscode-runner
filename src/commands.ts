@@ -1,46 +1,49 @@
-import * as path from 'path';
+import { FileTarget } from './target';
 
 export type CommandExecutor = (command: string) => void;
 export type Command = (ex: CommandExecutor) => (path: string) => void;
 
 export const convertFile: Command = (executeCommand) => (filePath) => {
-  if (!/.*\.js$/.test(filePath)) {
+  const target = new FileTarget(filePath);
+  if (target.isNotFlowFile) {
     throw new Error(`Cannot convert non-flow file '${filePath}'`);
   }
 
   executeCommand(
-    `node ./node_modules/.bin/flow-to-ts --write --prettier '${filePath}' -o ts`,
+    `node ./node_modules/.bin/flow-to-ts --write --prettier '${target}' -o ts`,
   );
 };
 
 export const generateTSDefForFile: Command = (executeCommand) => (filePath) => {
-  if (!/.*\.js$/.test(filePath)) {
+  const target = new FileTarget(filePath);
+  if (target.isNotFlowFile) {
     throw new Error(`Cannot convert non-flow file '${filePath}'`);
   }
-  const sourceName = path.basename(filePath).replace(/\.js$/, '');
-  const fileDirectory = path.dirname(filePath);
 
   executeCommand(
-    `node ./node_modules/.bin/flow-to-ts --prettier '${filePath}' -o ts > '${fileDirectory}/.${sourceName}.ts' && ` +
-      `node ./node_modules/.bin/tsc '${fileDirectory}/.${sourceName}.ts' --declaration --emitDeclarationOnly && ` +
-      `rm -f '${fileDirectory}/.${sourceName}.ts' && ` +
-      `mv '${fileDirectory}/.${sourceName}.d.ts' '${fileDirectory}/${sourceName}.d.ts'`,
+    `node ./node_modules/.bin/flow-to-ts --prettier '${target}' -o ts > '${target
+      .hidden()
+      .ts()}' && ` +
+      `node ./node_modules/.bin/tsc '${target
+        .hidden()
+        .ts()}' --declaration --emitDeclarationOnly && ` +
+      `rm -f '${target.hidden().ts()}' && ` +
+      `mv '${target.hidden().dts()}' '${target.dts()}'`,
   );
 };
 
 export const generateFlowDefForFile: Command = (executeCommand) => (
   filePath,
 ) => {
-  if (!/.*\.ts$/.test(filePath)) {
+  const target = new FileTarget(filePath);
+  if (target.isNotTSFile) {
     throw new Error(
       `Cannot generate Flow definitions from non-typescript file '${filePath}'`,
     );
   }
-  const sourceName = path.basename(filePath).replace(/\.ts$/, '');
-  const fileDirectory = path.dirname(filePath);
 
   executeCommand(
-    `node ./node_modules/.bin/flowgen '${filePath}' --add-flow-header -o '${fileDirectory}/${sourceName}.js.flow'`,
+    `node ./node_modules/.bin/flowgen '${target}' --add-flow-header -o '${target.jsFlow()}'`,
   );
 };
 

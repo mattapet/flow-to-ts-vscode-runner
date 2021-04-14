@@ -19,7 +19,7 @@ describe('commands', () => {
       convertFile(executeCommand)(fileName);
 
       expect(executeCommand).toHaveBeenCalledWith(
-        `node ./node_modules/.bin/flow-to-ts --write --prettier 'sample-flow-file.js' -o ts`,
+        `node ./node_modules/.bin/flow-to-ts --write --prettier './sample-flow-file.js' -o ts`,
       );
     });
 
