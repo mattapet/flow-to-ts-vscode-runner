@@ -23,8 +23,14 @@ export class Shell {
   public rename = (from: FileTarget, to: FileTarget): CommandWriter =>
     new CommandWriter(() => `mv '${from}' '${to}'`);
 
-  public findAll = (dir: string, pattern: string): CommandWriter =>
-    new CommandWriter(() => `find '${dir}' -type f -name '${pattern}'`);
+  public findAll = (dir: string, ...patterns: string[]): CommandWriter => {
+    const namesQuery = patterns
+      .map(pattern => `-name '${pattern}'`)
+      .join(' -o ');
+    return new CommandWriter(
+      () => `find '${dir}' -type f \\( ${namesQuery} \\)`,
+    );
+  };
 }
 
 export class FlowToTs {

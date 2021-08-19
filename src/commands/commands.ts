@@ -48,7 +48,7 @@ export class Commands {
 
   convertDirectory: Command = directoryPath => {
     return this.F.shell
-      .findAll(directoryPath, '*.js')
+      .findAll(directoryPath, '*.js', '*.jsx')
       .pipeAsArgsTo(this.F.flowToTs.convert());
   };
 }

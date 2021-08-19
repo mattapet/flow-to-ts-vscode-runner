@@ -13,7 +13,7 @@ export class FileTarget {
   }
 
   public get isFlowFile(): boolean {
-    return this.ext === 'js';
+    return this.ext === 'js' || this.ext === 'jsx';
   }
 
   public get isNotFlowFile(): boolean {

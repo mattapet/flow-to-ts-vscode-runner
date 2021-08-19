@@ -41,7 +41,7 @@ describe('commands', () => {
       const result = convertDirectory(directoryName).run();
 
       expect(result).toBe(
-        `find 'some-dir-filled-with-flow-files' -type f -name '*.js' | xargs node './node_modules/.bin/flow-to-ts' --write --prettier -o ts`,
+        `find 'some-dir-filled-with-flow-files' -type f \\( -name '*.js' -o -name '*.jsx' \\) | xargs node './node_modules/.bin/flow-to-ts' --write --prettier -o ts`,
       );
     });
   });

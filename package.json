@@ -78,6 +78,11 @@
           "when": "resourceExtname == '.js'"
         },
         {
+          "command": "extension.convertFlowFileToTs",
+          "group": "01_flow-to-typescript",
+          "when": "resourceExtname == '.jsx'"
+        },
+        {
           "command": "extension.generateTypescriptDefinitionsForFile",
           "group": "01_flow-to-typescript",
           "when": "resourceExtname == '.js'"
@@ -93,6 +98,11 @@
           "command": "extension.convertFlowFileToTs",
           "group": "01_flow-to-typescript",
           "when": "resourceExtname == '.js'"
+        },
+        {
+          "command": "extension.convertFlowFileToTs",
+          "group": "01_flow-to-typescript",
+          "when": "resourceExtname == '.jsx'"
         },
         {
           "command": "extension.generateTypescriptDefinitionsForFile",
