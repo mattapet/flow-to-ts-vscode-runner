@@ -12,7 +12,7 @@ A simple Visual Studio Code extension for running already existing [CLI tools](#
 
 ### Converting files
 
-Converts a single file from Flow to Typescript.
+Converts a single file from Flow to Typescript. Files with `.jsx` extension will generate `.tsx` files.
 
 **Requirements:**
 
@@ -22,7 +22,7 @@ Converts a single file from Flow to Typescript.
 
 ### Converting directories
 
-Converts all within the specified directory Flow files from Flow to Typescript recursively.
+Converts all within the specified directory Flow files from Flow to Typescript recursively. Files with `.jsx` extension will generate `.tsx` files.
 
 **Requirements:**
 
@@ -32,7 +32,9 @@ Converts all within the specified directory Flow files from Flow to Typescript r
 
 ### Generating Typescript definitions from Flow
 
-Generates Typescript definitions (`.d.ts`) for a given flow file.
+> No support for JSX
+
+Generates Typescript definitions (`.d.ts`) for a given flow file. 
 
 **Requirements:**
 
@@ -42,6 +44,8 @@ Generates Typescript definitions (`.d.ts`) for a given flow file.
 ![Generate Typescript definitions from Flow](public/generate-dts.gif)
 
 ### Generating Flow definitions from Typescript
+
+> No support for JSX
 
 Generates Flow definitions (`.js.flow`) for Typescript (`.ts`), or Typescript definition (`.d.ts`) file.
 

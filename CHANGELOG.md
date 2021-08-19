@@ -1,3 +1,10 @@
+### 0.0.3 (2021-08-19)
+
+#### Features
+
+* **Commands:**
+  * Add support for converting jsx -> tsx
+
 ### 0.0.2 (2021-04-15)
 
 #### Features
